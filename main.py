@@ -47,21 +47,6 @@ def format_regex(regex):
     output += regex[-1]
     return output
 
-def to_infix(postfix):
-    stack = []
-    for c in postfix:
-        #print (c)
-        if c in "*+?":
-            stack.append(stack.pop() + c)
-        elif c in "|.":
-            temp = "(" + stack[-2] + c + stack[-1] + ")"
-            stack.pop()
-            stack.pop()
-            stack.append(temp)
-        else:
-            stack.append(c)
-    return stack[0]
-
 
 class Link:
     def __init__(self, what, to):
@@ -89,23 +74,22 @@ class Node:
 def show_nfa(node):
     dot = Digraph(comment='NFA')
     cache = {i: False for i in range(NB_NODES)}
-    for i in range(NB_NODES):
-        dot.node(str(i), str(i))
     stack = [node]
     while len(stack):
         current = stack.pop()
+        dot.node(str(current.id), str(current.id))
         print (len(stack))
         cache[current.id] = True
         for n in current.out:
+            dot.edge(str(current.id), str(n.to.id), label = (n.what, "\\epsilon")[n.what == "¤"])
             if cache[n.to.id]:
                 continue
+
             stack.append(n.to)
-            dot.edge(str(current.id), str(n.to.id), label = n.what)
     dot.format = "png"
     dot.render("test.gv", view = True)
 
-
-def build_nfa(postfix):
+def to_infix(postfix):
     stack = []
     for c in postfix:
         #print (c)
@@ -121,6 +105,41 @@ def build_nfa(postfix):
     return stack[0]
 
 
+def build_nfa(postfix):
+    stack = []
+    start = Node()
+    current = start
+    for c in postfix:
+        if c == "?":
+            pass
+        elif c == "*":
+            pass
+        elif c == "+":
+            pass
+        elif c == ".":
+            n1_s, n1_e = stack.pop()
+            n2_s, n2_e = stack.pop()
+            n2_e.addLink("¤", n1_s)
+            stack.append((n2_s, n1_e))
+        elif c == "|":
+            n1_s, n1_e = stack.pop()
+            n2_s, n2_e = stack.pop()
+            s = Node()
+            e = Node()
+            s.addLink("¤", n1_s)
+            s.addLink("¤", n2_s)
+            n1_e.addLink("¤", e)
+            n2_e.addLink("¤", e)
+            stack.append((s, e))
+        else:
+            temp_s = Node()
+            temp_e = Node()
+            temp_s.addLink(c, temp_e)
+            stack.append((temp_s, temp_e))
+
+    return stack[0][0]
+
+
 reg_str = "(c|(ab)+|d)+"
 import re
 reg = re.compile(reg_str)
@@ -131,7 +150,7 @@ for test in tests:
     print ("    postfix: ", "".join(to_postfix(format_regex(test))))
     print ("    infix: ", to_infix("".join(to_postfix(format_regex(test)))))
 """
-
+"""
 n1 = Node()
 n2 = Node()
 n3 = Node()
@@ -139,4 +158,9 @@ n1.addLink('a', n2)
 n1.addLink('b', n2)
 n2.addLink('o', n3)
 
+
 show_nfa(n1)
+
+"""
+print (format_regex("ab"))
+show_nfa(build_nfa("".join(to_postfix(format_regex("ca|b")))))
