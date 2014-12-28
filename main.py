@@ -78,9 +78,10 @@ def show_nfa(node):
     while len(stack):
         current = stack.pop()
         dot.node(str(current.id), str(current.id))
-        print (len(stack))
         cache[current.id] = True
+        print (len(current.out))
         for n in current.out:
+            print (str(current.id), str(n.to.id), n.what)
             dot.edge(str(current.id), str(n.to.id), label = (n.what, "\\epsilon")[n.what == "¤"])
             if cache[n.to.id]:
                 continue
@@ -111,11 +112,24 @@ def build_nfa(postfix):
     current = start
     for c in postfix:
         if c == "?":
-            pass
-        elif c == "*":
-            pass
+            s, e = stack.pop()
+            s.addLink("¤", e)
+            stack.append((s, e))
         elif c == "+":
-            pass
+            s, e = Node(), Node()
+            t_s, t_e = stack.pop()
+            t_s.addLink("¤", t_e)
+            s.addLink("¤", t_s)
+            t_e.addLink("¤", e)
+            stack.append((s, e))
+        elif c == "*":
+            s, e = Node(), Node()
+            t_s, t_e = stack.pop()
+            t_s.addLink("¤", t_e)
+            s.addLink("¤", t_s)
+            t_e.addLink("¤", e)
+            s.addLink("¤", e)
+            stack.append((s, e))
         elif c == ".":
             n1_s, n1_e = stack.pop()
             n2_s, n2_e = stack.pop()
@@ -162,5 +176,6 @@ n2.addLink('o', n3)
 show_nfa(n1)
 
 """
-print (format_regex("ab"))
-show_nfa(build_nfa("".join(to_postfix(format_regex("ca|b")))))
+test = "a*"
+print (format_regex(test))
+show_nfa(build_nfa("".join(to_postfix(format_regex(test)))))
