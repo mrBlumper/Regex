@@ -74,18 +74,20 @@ class Node:
 def show_nfa(node):
     dot = Digraph(comment='NFA')
     cache = {i: False for i in range(NB_NODES)}
+    cache_links = {}
     stack = [node]
     while len(stack):
         current = stack.pop()
         dot.node(str(current.id), str(current.id))
         cache[current.id] = True
-        print (len(current.out))
         for n in current.out:
-            print (str(current.id), str(n.to.id), n.what)
-            dot.edge(str(current.id), str(n.to.id), label = (n.what, "\\epsilon")[n.what == "¤"])
+            key = str(str(current.id)+str(n.to.id)+n.what)
+            if not key in cache_links:
+                dot.edge(str(current.id), str(n.to.id), label = (n.what, "&#949;")[n.what == "¤"])
+
+                cache_links[key] = True
             if cache[n.to.id]:
                 continue
-
             stack.append(n.to)
     dot.format = "png"
     dot.render("test.gv", view = True)
@@ -133,7 +135,9 @@ def build_nfa(postfix):
         elif c == ".":
             n1_s, n1_e = stack.pop()
             n2_s, n2_e = stack.pop()
-            n2_e.addLink("¤", n1_s)
+            for o in n1_s.out:
+                n2_e.out.append(o)
+
             stack.append((n2_s, n1_e))
         elif c == "|":
             n1_s, n1_e = stack.pop()
@@ -176,6 +180,6 @@ n2.addLink('o', n3)
 show_nfa(n1)
 
 """
-test = "a*"
+test = "a*(b|cd?)+"
 print (format_regex(test))
 show_nfa(build_nfa("".join(to_postfix(format_regex(test)))))
