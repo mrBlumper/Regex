@@ -55,6 +55,7 @@ class Link:
 
 
 NB_NODES = 0
+NODES_pointers = []
 class Node:
     def __init__(self, id = -1):
         global NB_NODES
@@ -63,8 +64,10 @@ class Node:
         if id < 0:
             self.id = NB_NODES
             NB_NODES += 1
+            NODES_pointers.append(self)
         else:
             self.id = id
+            NODES_pointers[id] = self
     def addLink(self, link, to):
         if isinstance(link, Link):
             self.out.append(link)
@@ -120,14 +123,14 @@ def build_nfa(postfix):
         elif c == "+":
             s, e = Node(), Node()
             t_s, t_e = stack.pop()
-            t_s.addLink("¤", t_e)
+            t_e.addLink("¤", t_s)
             s.addLink("¤", t_s)
             t_e.addLink("¤", e)
             stack.append((s, e))
         elif c == "*":
             s, e = Node(), Node()
             t_s, t_e = stack.pop()
-            t_s.addLink("¤", t_e)
+            t_e.addLink("¤", t_s)
             s.addLink("¤", t_s)
             t_e.addLink("¤", e)
             s.addLink("¤", e)
@@ -137,7 +140,6 @@ def build_nfa(postfix):
             n2_s, n2_e = stack.pop()
             for o in n1_s.out:
                 n2_e.out.append(o)
-
             stack.append((n2_s, n1_e))
         elif c == "|":
             n1_s, n1_e = stack.pop()
@@ -155,7 +157,120 @@ def build_nfa(postfix):
             temp_s.addLink(c, temp_e)
             stack.append((temp_s, temp_e))
 
-    return stack[0][0]
+    return stack[0]
+
+def closures(input):
+    output = []
+
+def find_epsilons(nodes):
+    if not isinstance(nodes, list):
+        nodes = [nodes]
+    results = [n for n in nodes]
+    stack = [n for n in nodes]
+    cache = {n.id: True for n in nodes}
+    while len (stack):
+        current = stack.pop()
+        cache[current.id] = True
+        for n in current.out:
+            if n.what == "¤" and not n.to.id in cache:
+                stack.append(n.to)
+                results.append(n.to)
+    return results
+
+def move_NFA(nodes, symbol):
+    result = []
+    for node in nodes:
+        for edge in node.out:
+            if edge.what == symbol:
+                result.append(edge.to)
+    return result
+
+def move_DFA(nodes, symbol):
+    return find_epsilons(move_NFA(nodes, symbol))
+
+
+
+def show_dfa(node):
+    dot = Digraph(comment='DFA')
+    cache = {i: False for i in range(NB_NODES)}
+    cache_links = {}
+    stack = [node]
+    while len(stack):
+        current = stack.pop()
+        dot.node(str(str(current.id) + ("", "END")[current.is_end]), str(str(current.id) + ("", "END")[current.is_end]))
+        cache[current.id] = True
+        for n in current.out:
+            key = str(str(current.id)+str(n.to.id)+n.what)
+            if not key in cache_links:
+                dot.edge(str(str(current.id) + ("", "END")[current.is_end]), str(str(n.to.id) + ("", "END")[n.to.is_end]), label = (n.what, "&#949;")[n.what == "¤"])
+                cache_links[key] = True
+            if n.to.id in cache:
+                continue
+            stack.append(n.to)
+    dot.format = "png"
+    dot.render("test.gv", view = True)
+
+
+DFA_NBR_NODES = 0
+class DFA_node:
+    def __init__(self, nodes, ends):
+        global DFA_NBR_NODES
+        self.nodes = nodes
+        self.out = []
+        self.id = DFA_NBR_NODES
+        self.is_end = False
+        if not ends is None:
+            for n in nodes:
+                if n.id == ends.id:
+                    self.is_end = True
+        DFA_NBR_NODES += 1
+    def __eq__(self, other):
+        if not len(self.nodes) == len(other.nodes):
+            return False
+        self.nodes = sorted(self.nodes, key = lambda n: n.id)
+        other.nodes = sorted(other.nodes, key = lambda n: n.id)
+        for a, b in zip(self.nodes, other.nodes):
+            if not a == b:
+                return False
+        return True
+    def addLink(self, link, to):
+        if isinstance(link, Link):
+            self.out.append(link)
+        else:
+            self.out.append(Link(link, to))
+
+def exist(nodes, node):
+    for i, n in enumerate(nodes):
+        if n == node:
+            return i
+    return -1
+
+def convert_to_dfa(nfa, end = None, alphabet = None):
+    if alphabet is None:
+        alphabet = [chr(i) for i in range(33, 126)]
+    nodes = [DFA_node(find_epsilons(nfa), end)]
+    stack = [nodes[0]]
+    start = nodes[0]
+    while len(stack):
+        current = stack.pop()
+        for c in alphabet:
+
+            #print (type(current))
+            temp = DFA_node(move_DFA(current.nodes, c), end)
+            if not len(temp.nodes):
+                continue
+            #print ("-",[n.id for n in current.nodes], [n.id for n in temp.nodes])
+            pos = exist(nodes, temp)
+            if pos < 0:
+                #print ("ok")
+                nodes.append(temp)
+                stack.append(temp)
+                pos = len(nodes) - 1
+            current.addLink(c, nodes[pos])
+
+    return start
+
+
 
 
 reg_str = "(c|(ab)+|d)+"
@@ -180,6 +295,15 @@ n2.addLink('o', n3)
 show_nfa(n1)
 
 """
-test = "a*(b|cd?)+"
+test = "a(a|b)+"
 print (format_regex(test))
-show_nfa(build_nfa("".join(to_postfix(format_regex(test)))))
+nfa, end_nfa = build_nfa("".join(to_postfix(format_regex(test))))
+#show_nfa(build_nfa("".join(to_postfix(format_regex(test)))))
+"""
+print (NODES_pointers[7].id)
+print ([n.id for n in find_epsilons(NODES_pointers[7])])
+A = move_NFA(find_epsilons(NODES_pointers[7]), 'b')
+print ([n.id for n in find_epsilons(A)])
+"""
+dfa = convert_to_dfa(nfa, end_nfa)
+show_dfa(dfa)
