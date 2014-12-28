@@ -1,5 +1,5 @@
-"""from graphviz import Digraph
-
+from graphviz import Digraph
+"""
 dot = Digraph(comment='The Round Table')
 dot.format = "png"
 dot.render('test.cv', view=True)"""
@@ -62,15 +62,81 @@ def to_infix(postfix):
             stack.append(c)
     return stack[0]
 
+
+class Link:
+    def __init__(self, what, to):
+        self.what = what
+        self.to = to
+
+
+NB_NODES = 0
+class Node:
+    def __init__(self, id = -1):
+        global NB_NODES
+        self.start = None
+        self.out = []
+        if id < 0:
+            self.id = NB_NODES
+            NB_NODES += 1
+        else:
+            self.id = id
+    def addLink(self, link, to):
+        if isinstance(link, Link):
+            self.out.append(link)
+        else:
+            self.out.append(Link(link, to))
+
+def show_nfa(node):
+    dot = Digraph(comment='NFA')
+    cache = {i: False for i in range(NB_NODES)}
+    for i in range(NB_NODES):
+        dot.node(str(i), str(i))
+    stack = [node]
+    while len(stack):
+        current = stack.pop()
+        print (len(stack))
+        cache[current.id] = True
+        for n in current.out:
+            if cache[n.to.id]:
+                continue
+            stack.append(n.to)
+            dot.edge(str(current.id), str(n.to.id), label = n.what)
+    dot.format = "png"
+    dot.render("test.gv", view = True)
+
+
 def build_nfa(postfix):
-    pass
+    stack = []
+    for c in postfix:
+        #print (c)
+        if c in "*+?":
+            stack.append(stack.pop() + c)
+        elif c in "|.":
+            temp = "(" + stack[-2] + c + stack[-1] + ")"
+            stack.pop()
+            stack.pop()
+            stack.append(temp)
+        else:
+            stack.append(c)
+    return stack[0]
+
 
 reg_str = "(c|(ab)+|d)+"
 import re
 reg = re.compile(reg_str)
-
+"""
 tests = ["abc", "ab|c", "ab+c", "a(bb)+c"]
 for test in tests:
     print ("regex: ", "".join((format_regex(test))))
     print ("    postfix: ", "".join(to_postfix(format_regex(test))))
     print ("    infix: ", to_infix("".join(to_postfix(format_regex(test)))))
+"""
+
+n1 = Node()
+n2 = Node()
+n3 = Node()
+n1.addLink('a', n2)
+n1.addLink('b', n2)
+n2.addLink('o', n3)
+
+show_nfa(n1)
