@@ -188,87 +188,64 @@ def move_NFA(nodes, symbol):
 def move_DFA(nodes, symbol):
     return find_epsilons(move_NFA(nodes, symbol))
 
-
-
-def show_dfa(node):
+def show_dfa(dfa):
     dot = Digraph(comment='DFA')
-    cache = {i: False for i in range(NB_NODES)}
-    cache_links = {}
-    stack = [node]
-    while len(stack):
-        current = stack.pop()
-        dot.node(str(str(current.id) + ("", "END")[current.is_end]), str(str(current.id) + ("", "END")[current.is_end]))
-        cache[current.id] = True
-        for n in current.out:
-            key = str(str(current.id)+str(n.to.id)+n.what)
-            if not key in cache_links:
-                dot.edge(str(str(current.id) + ("", "END")[current.is_end]), str(str(n.to.id) + ("", "END")[n.to.is_end]), label = (n.what, "&#949;")[n.what == "¤"])
-                cache_links[key] = True
-            if n.to.id in cache:
-                continue
-            stack.append(n.to)
+    for i, node in enumerate(dfa):
+        dot.node(str(i), str(i), shape = ("circle", "doublecircle")[node.is_end])
+        for c in node.out:
+            dot.edge(str(i), str(node.out[c]), label = c)
     dot.format = "png"
     dot.render("test.gv", view = True)
 
 
-DFA_NBR_NODES = 0
-class DFA_node:
-    def __init__(self, nodes, ends):
-        global DFA_NBR_NODES
+
+def exist(dfa, current):
+    for i, n in enumerate(dfa):
+        if n == current:
+            return i
+    return -1
+
+class DFA_branch:
+    def __init__(self, nodes, id_end):
         self.nodes = nodes
-        self.out = []
-        self.id = DFA_NBR_NODES
         self.is_end = False
-        if not ends is None:
-            for n in nodes:
-                if n.id == ends.id:
-                    self.is_end = True
-        DFA_NBR_NODES += 1
+        if id_end in self.nodes:
+            self.is_end = True
+        self.out = {}
+        self.sum = sum(self.nodes)
+    def add_link(self, symbol, target):
+        self.out[symbol] = target
     def __eq__(self, other):
-        if not len(self.nodes) == len(other.nodes):
+        if not (len(self.nodes) == len(other.nodes)  and self.sum == other.sum) :
             return False
-        self.nodes = sorted(self.nodes, key = lambda n: n.id)
-        other.nodes = sorted(other.nodes, key = lambda n: n.id)
+        self.nodes.sort()
+        other.nodes.sort()
         for a, b in zip(self.nodes, other.nodes):
             if not a == b:
                 return False
         return True
-    def addLink(self, link, to):
-        if isinstance(link, Link):
-            self.out.append(link)
-        else:
-            self.out.append(Link(link, to))
-
-def exist(nodes, node):
-    for i, n in enumerate(nodes):
-        if n == node:
-            return i
-    return -1
 
 def convert_to_dfa(nfa, end = None, alphabet = None):
     if alphabet is None:
         alphabet = [chr(i) for i in range(33, 126)]
-    nodes = [DFA_node(find_epsilons(nfa), end)]
-    stack = [nodes[0]]
-    start = nodes[0]
+    dfa = []
+    dfa.append(DFA_branch([n.id for n in find_epsilons(nfa)], end))
+    stack = [dfa[0]]
     while len(stack):
         current = stack.pop()
         for c in alphabet:
-
-            #print (type(current))
-            temp = DFA_node(move_DFA(current.nodes, c), end)
+            temp = DFA_branch([n.id for n in move_DFA([NODES_pointers[i] for i in current.nodes], c)], end)
             if not len(temp.nodes):
                 continue
             #print ("-",[n.id for n in current.nodes], [n.id for n in temp.nodes])
-            pos = exist(nodes, temp)
+            pos = exist(dfa, temp)
             if pos < 0:
-                #print ("ok")
-                nodes.append(temp)
+                dfa.append(temp)
                 stack.append(temp)
-                pos = len(nodes) - 1
-            current.addLink(c, nodes[pos])
+                pos = len(dfa) - 1
+            current.add_link(c, pos)
 
-    return start
+    return dfa
 
 
 
@@ -305,5 +282,6 @@ print ([n.id for n in find_epsilons(NODES_pointers[7])])
 A = move_NFA(find_epsilons(NODES_pointers[7]), 'b')
 print ([n.id for n in find_epsilons(A)])
 """
-dfa = convert_to_dfa(nfa, end_nfa)
-show_dfa(dfa)
+dfa_ = convert_to_dfa(nfa, end_nfa)
+show_dfa(dfa_)
+
