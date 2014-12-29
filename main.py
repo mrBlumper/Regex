@@ -229,12 +229,12 @@ def convert_to_dfa(nfa, end = None, alphabet = None):
     if alphabet is None:
         alphabet = [chr(i) for i in range(33, 126)]
     dfa = []
-    dfa.append(DFA_branch([n.id for n in find_epsilons(nfa)], end))
+    dfa.append(DFA_branch([n.id for n in find_epsilons(nfa)], end.id))
     stack = [dfa[0]]
     while len(stack):
         current = stack.pop()
         for c in alphabet:
-            temp = DFA_branch([n.id for n in move_DFA([NODES_pointers[i] for i in current.nodes], c)], end)
+            temp = DFA_branch([n.id for n in move_DFA([NODES_pointers[i] for i in current.nodes], c)], end.id)
             if not len(temp.nodes):
                 continue
             #print ("-",[n.id for n in current.nodes], [n.id for n in temp.nodes])
@@ -272,7 +272,23 @@ n2.addLink('o', n3)
 show_nfa(n1)
 
 """
-test = "a(a|b)+"
+
+def match(dfa, string):
+    state = 0
+    last_end = 0
+    for i, c in enumerate(string):
+        #print (c, state)
+        if not c in dfa[state].out:
+            break
+
+        if dfa[dfa[state].out[c]].is_end:
+            last_end = i+1
+        state = dfa[state].out[c]
+
+    #print (last_end)
+    return string[:last_end]
+
+test = "bon(jour|soir)"
 print (format_regex(test))
 nfa, end_nfa = build_nfa("".join(to_postfix(format_regex(test))))
 #show_nfa(build_nfa("".join(to_postfix(format_regex(test)))))
@@ -285,3 +301,6 @@ print ([n.id for n in find_epsilons(A)])
 dfa_ = convert_to_dfa(nfa, end_nfa)
 show_dfa(dfa_)
 
+print (match(dfa_, "bonjour"))
+print (match(dfa_, "bonsoir"))
+print (match(dfa_, "bonp"))
