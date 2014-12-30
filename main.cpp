@@ -7,98 +7,33 @@ using namespace std;
 #include <cstring>
 #include <map>
 #include <queue>
+#include <bitset>
 
-class Regex{
-public:
-    Regex(){
-        //_precedence['('] = 1;
-        _precedence['|'] = 2;
-        _precedence['.'] = 0;
-        /*_precedence['?'] = 4;
-        _precedence['*'] = 4;
-        _precedence['+'] = 4;*/
+#include "declarations.h"
+//\n->10
+//\t->9
+int main(){/*
+    short c = 49;
+    std::cout<<std::bitset<sizeof(short)*8>(c)<<"\n";
+    c<<=8;
+    std::cout<<std::bitset<sizeof(short)*8>(c)<<"\n";
+    c+=52;
+    unsigned char a = c&0xFF;
+    unsigned char b = c>>8;
+    std::cout<<std::bitset<sizeof(short)*8>(c)<<"\n";
+    std::cout<<(int)a<<" "<<(int)b<<'\n';*/
+/*
+    short symbol = makeRange('k', 'p');
+    std::cout<<(char)(symbol>>8)<<" "<<(char)(symbol&0xFF)<<"\n";
+    std::cout<<symbol<<"\n";
+    short symbol_2 = (short)'l';
+    for (char c = 'a'; c <= 't'; c++){
+        std::cout<<c<<" "<<symbolCorresponds(symbol, c)<<' '<<symbolCorresponds(symbol_2, c)<<"\n";
+    }*/
+    std::vector <int> test = {1, 2, 3, 4, 5, 7, 8, 9, 10};
+    for (int i = 0; i <= 10; i++){
+        std::cout<<i<<" "<<in<int>(test, i)<<"\n";
     }
-    std::string toPostFix(std::string regex){
-        std::string output = "";
-        std::queue<char> stack;
-        regex = this->format(regex);
-
-        std::cout<<regex<<"\n";
-        for (unsigned int i = 0; i < regex.size(); i++){
-            char c = regex[i];
-            if (c == '('){
-                stack.push(c);
-            } else if (c == ')'){
-                while (!stack.empty() && stack.front() != '('){
-                    output += stack.front();
-                    stack.pop();
-                }
-                if (!stack.empty())
-                    stack.pop();
-            } else {
-                while (!stack.empty()){
-                    char front = stack.front();
-                    if (front == '('){stack.pop(); continue;}
-                    //std::cout<<front<<"\n";
-                    char precedence_front = this->get_precedence(front);
-                    char precedence_current = this->get_precedence(c);
-                    //std::cout<<c<<" "<<(int)precedence_current<<" "<<front<<" "<<(int)precedence_front<<"\n";
-                    if (precedence_front >= precedence_current){
-                        output += front;
-                        stack.pop();
-                    } else {
-                        break;
-                    }
-                }
-                stack.push(c);
-            }
-        }
-        while (!stack.empty()){
-            if (stack.front() == '(') continue;
-            output += stack.front();
-            //std::cout<<stack.front()<<" ";
-            stack.pop();
-        }
-        //std::cout<<"\n";
-        return output;
-    }
-    std::string format(std::string regex){
-        std::string output = "";
-        for (unsigned int i = 0; i < regex.size(); i++){
-            char c = regex[i];
-            if (i + 1 < regex.size()){
-                char n = regex[i + 1];
-                output += c;
-                if (c != '(' && n != ')' && c != '|' && n != '|' && n != '.' && n != '?' && n != '*' && n != '+'){
-                    output += '.';
-                }
-            }
-        }
-        output += regex[regex.size() - 1];
-        return output;
-    }
-private:
-    char get_precedence(char c) {
-        if (_precedence.find(c) == _precedence.end()){
-            return 6;
-        }
-        return _precedence[c];
-    }
-    std::map<char, char> _precedence;
-
-};
-
-
-int main(){
-    //cout << "Hello world!" << endl;
-    char *re = "hello";
-    std::cout<<re<<"\n";
-    for(; *re; re++){
-            std::cout<<*re<<"\n";
-    }
-    std::string reg = "a(bc|d)+a?b*c";
-    Regex regex;
-    std::cout<<regex.toPostFix(reg)<<"\n";
 
     return 0;
 }
