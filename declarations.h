@@ -55,6 +55,7 @@ namespace SYMBOL{
     extern char CLOSE_BRACKET;
     extern char OPEN_CURLY;
     extern char CLOSE_CURLY;
+    extern char INTERVAL;
 
     extern std::string escaped_char;
     extern std::vector<char> operators;

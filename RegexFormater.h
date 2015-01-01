@@ -4,6 +4,19 @@
 #include "declarations.h"
 #include <iostream>
 
+struct RegexRepetition{
+    RegexRepetition(int s=0, int mi=0, int ma=0){
+        size = s;
+        min = mi;
+        max = ma;
+        interval = false;
+    }
+    int size;
+    int min;
+    int max;
+    bool interval;
+};
+
 class RegexFormater
 {
     public:
@@ -23,6 +36,7 @@ class RegexFormater
         std::vector<short>  _temp_shorts;
     private:
         int         findBestReplace(int index);
+        RegexRepetition treatRepetition(int index);
 };
 
 #endif // REGEXFORMATER_H

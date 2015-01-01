@@ -26,7 +26,16 @@ std::string transformBracketOp(std::string content){
     return "";
 }
 int main(){
-    std::cout<<transformBracketOp("A-Z-");/*
+    std::cout<<transformBracketOp("A-Z-");
+
+
+    RegexFormater f("(blah){2,}mm");
+    f.replaceGroups();
+    f.treatSpecialCharacters();
+    f.createDuplicatas();
+    f.debug();
+
+    /*
     for (auto it = SYMBOL::replace_expressions.begin(); it != SYMBOL::replace_expressions.end(); ++it){
         std::cout<<(*it).pattern<<" "<<(*it).translate<<"\n";
     }

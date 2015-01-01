@@ -40,7 +40,7 @@ bool in(const std::string str, const char element){
 namespace SYMBOL{
 
     bool isOp(char c){
-        return !(c == 9 || c == 10 || c > 19);
+        return !(c == 9 || c == 10 || c > 20);
     }
     char BEGIN_WORD     = 1;
     char END_WORD       = 2;
@@ -59,6 +59,7 @@ namespace SYMBOL{
     char CLOSE_BRACKET  = 16;   // ']'
     char OPEN_CURLY     = 17;   // '{'
     char CLOSE_CURLY    = 18;   // '}'
+    char INTERVAL       = 20;   // '}'
     //*/
 /*
     char CONCATENATION='.';
@@ -73,7 +74,7 @@ namespace SYMBOL{
     std::vector<char> operators = {CONCATENATION, ZEROORMORE, ONEORMORE, ZEROORMORE, OR};
     std::map<char, char> special_chars = {{'(', OPEN_PAR}, {')', CLOSE_PAR}, {'[', OPEN_BRACKET}, {']', CLOSE_BRACKET}, {'{', OPEN_CURLY}, {'}', CLOSE_CURLY},
                                           {'*', ZEROORMORE}, {'+', ONEORMORE}, {'?', ZEROORONE}, {'$', DOLLAR}, {'^', CARET}, {'|', OR}};
-    std::vector<ReplacedExpression> replace_expressions = {ReplacedExpression(".", {"[\t",toStr((char)20),"-",toStr((char)127),"]"}),
+    std::vector<ReplacedExpression> replace_expressions = {ReplacedExpression(".", {"[\t",toStr((char)21),"-",toStr((char)127),"]"}),
                                                            ReplacedExpression("$", ""+END_WORD),
                                                            ReplacedExpression("^", {BEGIN_WORD}),
                                                            ReplacedExpression("\\d", "[0-9]"),
