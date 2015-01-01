@@ -1,6 +1,11 @@
 #include "declarations.h"
 
 
+std::string toStr(char c){
+    std::string temp = "";
+    temp += c;
+    return temp;
+}
 /*indicates if the symbol is a range or not*/
 inline bool isRange(const short symbol){
     return (symbol != (symbol&0xFF));
@@ -33,6 +38,10 @@ bool in(const std::string str, const char element){
 
 
 namespace SYMBOL{
+
+    bool isOp(char c){
+        return !(c == 9 || c == 10 || c > 19);
+    }
     char BEGIN_WORD     = 1;
     char END_WORD       = 2;
     char CONCATENATION  = 3;    // '.'
@@ -41,8 +50,8 @@ namespace SYMBOL{
     char ZEROORONE      = 6;    // '?'
     char BACKSLASH      = 7;    // '\'
     char CARET          = 8;    // '^'
-    //put space for char 9 & 10 ('\n' and '\t')
-    char DOLLAR         = 11;   // '$'
+    //put space for char 9 & 10 & 11 ('\n' and '\t' and vertical tab)
+    char DOLLAR         = 19;   // '$'
     char OR             = 12;   // '|'
     char OPEN_PAR       = 13;   // '('
     char CLOSE_PAR      = 14;   // ')'
@@ -60,8 +69,28 @@ namespace SYMBOL{
     char OPEN_PAR='(';
     char CLOSE_PAR=')';
 //*/
-    std::string escaped_char = R"(\^$.|?*+()[{)"; //raw string litteral
+    std::string escaped_char = R"(\^$.|?*+()[]{})"; //raw string litteral
     std::vector<char> operators = {CONCATENATION, ZEROORMORE, ONEORMORE, ZEROORMORE, OR};
     std::map<char, char> special_chars = {{'(', OPEN_PAR}, {')', CLOSE_PAR}, {'[', OPEN_BRACKET}, {']', CLOSE_BRACKET}, {'{', OPEN_CURLY}, {'}', CLOSE_CURLY},
                                           {'*', ZEROORMORE}, {'+', ONEORMORE}, {'?', ZEROORONE}, {'$', DOLLAR}, {'^', CARET}, {'|', OR}};
+    std::vector<ReplacedExpression> replace_expressions = {ReplacedExpression(".", {"[\t",toStr((char)20),"-",toStr((char)127),"]"}),
+                                                           ReplacedExpression("$", ""+END_WORD),
+                                                           ReplacedExpression("^", {BEGIN_WORD}),
+                                                           ReplacedExpression("\\d", "[0-9]"),
+                                                           ReplacedExpression("\\D", "[^0-9]"),
+                                                           ReplacedExpression("\\w", "[_A-Za-z0-9]"),
+                                                           ReplacedExpression("\\W", "[^_A-Za-z0-9]"),
+                                                           ReplacedExpression("\\s", {"[\n\t\r ",toStr((char)12),toStr((char)11),"]"}),
+                                                           ReplacedExpression("\\S", {"[^\n\t\r ",toStr((char)12),toStr((char)11),"]"}),
+                                                           ReplacedExpression("[:alnum:]", "[a-zA-Z0-9]"),
+                                                           ReplacedExpression("[:alpha:]", "[a-zA-Z]"),
+                                                           ReplacedExpression("[:blank:]", "[\t ]"),
+                                                           ReplacedExpression("[:digits:]", "[0-9]"),
+                                                           ReplacedExpression("[:graph:]", {"[!-",toStr((char)127),"]"}),
+                                                           ReplacedExpression("[:lower:]", "[a-z]"),
+                                                           ReplacedExpression("[:print:]", {"[ -",toStr((char)127),"]"}),
+                                                           ReplacedExpression("[:punct:]", "[<>,\\?;.:/!§\\*µù%\\$£¤¨=\\+\\}\\)\\]°@\\^_`\\|-\\[\\(\\{'\"#~\\\\&]"),
+                                                           ReplacedExpression("[:space:]", {"[ \r\t",toStr((char)12),toStr((char)11),"]"}),
+                                                           ReplacedExpression("[:upper:]", "[A-Z]"),
+                                                           ReplacedExpression("[:xdigit:]", "[0-9a-fA-F]")};
 }

@@ -6,6 +6,37 @@ RegexFormater::RegexFormater(std::string regex):
     //ctor
 }
 
+int RegexFormater::findBestReplace(int index){
+    int temp = -1;
+    int len = 1;
+    for (int i = 0; i < SYMBOL::replace_expressions.size(); ++i){
+        std::string pattern = SYMBOL::replace_expressions[i].pattern;
+        std::string sub = this->_current.substr(index, pattern.size());
+        if (sub == pattern && len <= sub.size()){
+            temp = i;
+            len = sub.size();
+        }
+    }
+    return temp;
+}
+
+void RegexFormater::replaceGroups(){
+    std::string temp = "";
+    int i = 0;
+    while (i < this->_current.size()){
+        int match = this->findBestReplace(i);
+        if (match >= 0){
+            temp += SYMBOL::replace_expressions[match].translate;
+            i += SYMBOL::replace_expressions[match].pattern.size();
+
+        } else {
+            temp += this->_current[i];
+            ++i;
+        }
+    }
+    this->_current = temp;
+}
+
 void RegexFormater::debug(){
     std::string out = "";
     std::map<char, char> reversed;

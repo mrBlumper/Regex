@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 #include <map>
+
+std::string toStr(char c);
 inline bool isRange(const short symbol);
 bool symbolCorresponds(const short symbol, const char c);
 short makeRange(const char down, const char up);
@@ -21,6 +23,21 @@ bool in(const std::string str, const char element);
 
 //constants
 namespace SYMBOL{
+    bool isOp(char c);
+    struct ReplacedExpression{
+        ReplacedExpression(std::string p, std::string t){
+            pattern = p;
+            translate = t;
+        }
+        ReplacedExpression(std::string p, std::initializer_list<std::string> t){
+            pattern = p;
+            translate = "";
+            for (auto& e : t)
+                translate += e;
+        }
+        std::string pattern;
+        std::string translate;
+    };
     extern char BEGIN_WORD;
     extern char END_WORD;
     extern char CONCATENATION;
@@ -42,6 +59,7 @@ namespace SYMBOL{
     extern std::string escaped_char;
     extern std::vector<char> operators;
     extern std::map<char, char> special_chars;
+    extern std::vector<ReplacedExpression> replace_expressions;
 }
 
 

@@ -13,7 +13,32 @@ using namespace std;
 #include "RegexFormater.h"
 //\n->10
 //\t->9
-int main(){/*
+
+std::string transformBracketOp(std::string content){
+    for (auto it = content.begin(); it != content.end(); ++it){
+        auto previous = std::prev(it);
+        auto next = std::next(it);
+        std::cout<<*previous<<" "<<*it<<" "<<*next<<"\n";
+        if (*it == '-' && previous != content.end() && next != content.end()){
+            std::cout<<"OK\n";
+        }
+    }
+    return "";
+}
+int main(){
+    std::cout<<transformBracketOp("A-Z-");/*
+    for (auto it = SYMBOL::replace_expressions.begin(); it != SYMBOL::replace_expressions.end(); ++it){
+        std::cout<<(*it).pattern<<" "<<(*it).translate<<"\n";
+    }
+    RegexFormater f(".bonj\\dour[:digits:]a[:alpha:]");
+    f.replaceGroups();
+    f.debug();//*/
+
+    /*
+    for (int i = 0; i < 128; i++){
+        std::cout<<i<<" "<<(char)i<<"\n";
+    }*/
+    /*
     short c = 49;
     std::cout<<std::bitset<sizeof(short)*8>(c)<<"\n";
     c<<=8;
@@ -45,10 +70,13 @@ int main(){/*
     std::cout<<f.getStr()<<"\n";
     f.escapeCharacters();
     std::cout<<f.getStr();*/
+
+    /*
     RegexFormater f(R"(aazeze\(az\n)\+\\\*)");
     f.treatSpecialCharacters();
     //f.escapeCharacters();
-    f.debug();
+    f.debug();*/
+
     /*
     /*
     std::vector<std::string> tests = {"bla(bla){0,3}", "bla(){0,3}", "(blabla){0,3}", "(bla(bla)){0,3}", "b{0,3}", "+{}", "{}"};
