@@ -11,9 +11,10 @@ class RegexFormater
         virtual ~RegexFormater();
 
         std::string getPreviousGroup(const unsigned int pos);
-        void        escapeCharacters();
+        void        treatSpecialCharacters();
 
         std::string getStr(){return _current;}
+        void debug();
     protected:
         std::string _current;
     private:

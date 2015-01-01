@@ -6,19 +6,42 @@ RegexFormater::RegexFormater(std::string regex):
     //ctor
 }
 
-void RegexFormater::escapeCharacters(){
-    std::string temp = "";
-    if (this->_current.size() <= 1)
-        return;
-    for (unsigned int i = 0; i < this->_current.size() - 1; ++i){
-        if (this->_current[i] == '\\' && in(SYMBOL::escaped_char, this->_current[i+1])){
-            temp += this->_current[++i];
-            continue;
+void RegexFormater::debug(){
+    std::string out = "";
+    std::map<char, char> reversed;
+    for (auto it = SYMBOL::special_chars.begin(); it != SYMBOL::special_chars.end(); ++it){
+        reversed[it->second] = it->first;
+    }
+    for(auto& c : this->_current){
+        if (reversed.find(c) != reversed.end()){
+            out = out+"#"+reversed[c]+"#";
+        } else {
+            out += c;
         }
-        temp += this->_current[i];
+    }
+    std::cout<<out<<"\n";
+}
+
+void RegexFormater::treatSpecialCharacters(){
+    std::string temp = "";
+    for (int i = 0; i < this->_current.size(); i++){
+        char c = this->_current[i];
+        if (c == '\\'){
+            if (i == this->_current.size() - 1)
+                break;
+            if (in(SYMBOL::escaped_char, this->_current[i+1])){
+                temp += this->_current[++i];
+                continue;
+            }
+        } else if (SYMBOL::special_chars.find(c) != SYMBOL::special_chars.end()){
+            temp += SYMBOL::special_chars[c];
+        } else {
+            temp += c;
+        }
     }
     this->_current = temp;
 }
+
 
 std::string RegexFormater::getPreviousGroup(const unsigned int pos){
     if (pos == 0 || pos >= this->_current.size()){

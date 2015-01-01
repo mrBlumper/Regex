@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <map>
 inline bool isRange(const short symbol);
 bool symbolCorresponds(const short symbol, const char c);
 short makeRange(const char down, const char up);
@@ -40,6 +41,7 @@ namespace SYMBOL{
 
     extern std::string escaped_char;
     extern std::vector<char> operators;
+    extern std::map<char, char> special_chars;
 }
 
 

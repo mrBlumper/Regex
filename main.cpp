@@ -40,10 +40,16 @@ int main(){/*
     /*RegexFormater formater("bla(bla){0,3}");
     std::string test = "bla(bla){0,3}";
     std::cout<<formater.getPreviousGroup(8)<<"\n";*/
+    /*
     RegexFormater f(R"(aazeze\(az\n)\+\\\*)");
     std::cout<<f.getStr()<<"\n";
     f.escapeCharacters();
-    std::cout<<f.getStr();
+    std::cout<<f.getStr();*/
+    RegexFormater f(R"(aazeze\(az\n)\+\\\*)");
+    f.treatSpecialCharacters();
+    //f.escapeCharacters();
+    f.debug();
+    /*
     /*
     std::vector<std::string> tests = {"bla(bla){0,3}", "bla(){0,3}", "(blabla){0,3}", "(bla(bla)){0,3}", "b{0,3}", "+{}", "{}"};
     for (auto& e : tests){

@@ -32,7 +32,7 @@ bool in(const std::string str, const char element){
 
 
 
-namespace SYMBOL{/*
+namespace SYMBOL{
     char BEGIN_WORD     = 1;
     char END_WORD       = 2;
     char CONCATENATION  = 3;    // '.'
@@ -51,15 +51,17 @@ namespace SYMBOL{/*
     char OPEN_CURLY     = 17;   // '{'
     char CLOSE_CURLY    = 18;   // '}'
     //*/
-
+/*
     char CONCATENATION='.';
     char ZEROORMORE='*';
     char ONEORMORE='+';
-    char ZEROORNONE='?';
+    char ZEROORONE='?';
     char OR='|';
     char OPEN_PAR='(';
     char CLOSE_PAR=')';
-
-    std::string escaped_char = R"(\^&.|?*+()[{)"; //raw string litteral
+//*/
+    std::string escaped_char = R"(\^$.|?*+()[{)"; //raw string litteral
     std::vector<char> operators = {CONCATENATION, ZEROORMORE, ONEORMORE, ZEROORMORE, OR};
+    std::map<char, char> special_chars = {{'(', OPEN_PAR}, {')', CLOSE_PAR}, {'[', OPEN_BRACKET}, {']', CLOSE_BRACKET}, {'{', OPEN_CURLY}, {'}', CLOSE_CURLY},
+                                          {'*', ZEROORMORE}, {'+', ONEORMORE}, {'?', ZEROORONE}, {'$', DOLLAR}, {'^', CARET}, {'|', OR}};
 }
