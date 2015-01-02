@@ -4,6 +4,7 @@
 
 #include "RegexFormater.h"
 #include <stack>
+#include "NFA.h"
 
 int REGEX_precedence(short c);
 
@@ -19,6 +20,7 @@ class Regex
         std::string         _base;
         std::vector<short>  _formated;
         std::vector<short>  _postfix;
+        NFA                 _nfa;
     private:
 };
 

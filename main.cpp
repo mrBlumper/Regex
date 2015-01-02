@@ -40,7 +40,7 @@ int main(){
     //RegexFormater f("\\.zr$e\\$r[:punct:]e[^za()z[e\\]r]z.t");
     f.convert();*/
 
-    Regex regex("bon(jour|soir)");
+    Regex regex("a*(b|cd?)+");
     regex.compile();
 
     /*

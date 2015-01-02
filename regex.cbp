@@ -33,6 +33,10 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="Automata.cpp" />
+		<Unit filename="Automata.h" />
+		<Unit filename="NFA.cpp" />
+		<Unit filename="NFA.h" />
 		<Unit filename="Regex.cpp" />
 		<Unit filename="Regex.h" />
 		<Unit filename="RegexFormater.cpp" />

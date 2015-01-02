@@ -23,6 +23,8 @@ Regex::Regex(std::string reg):
 void Regex::compile(){
     this->format();
     this->toPostfix();
+    _nfa.build(this->_postfix);
+    _nfa.show();
 }
 
 void Regex::format(){
@@ -32,7 +34,7 @@ void Regex::format(){
 }
 
 void Regex::toPostfix(){
-    this->_postfix = convertToPostfix<short>(_formated, (short)SYMBOL::OPEN_PAR, SYMBOL::CLOSE_PAR, REGEX_precedence);
+    this->_postfix = convertToPostfix<short>(_formated, (short)SYMBOL::OPEN_PAR, SYMBOL::CLOSE_PAR, REGEX_precedence);/*
 
     std::map<char, char> reversed;
     for (auto it = SYMBOL::special_chars.begin(); it != SYMBOL::special_chars.end(); ++it){
@@ -48,7 +50,7 @@ void Regex::toPostfix(){
                 std::cout<<"[ "<<(char)c<<" ]\n";
             }
         }
-    }
+    }*/
 }
 
 Regex::~Regex()

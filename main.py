@@ -305,4 +305,4 @@ print (match(dfa_, "bonjour"))
 print (match(dfa_, "bonsoir"))
 print (match(dfa_, "bonp"))
 
-print (to_postfix(format_regex("bon(jour|soir)")))
+print (to_postfix(format_regex("a*(b|cd?)+")))

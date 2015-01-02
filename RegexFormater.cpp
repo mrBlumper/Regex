@@ -12,7 +12,8 @@ void RegexFormater::setExplicitConcat(){
         char c = this->_current[i];
         temp += c;
         char n = this->_current[i+1];
-        if (c != SYMBOL::OPEN_PAR && c != SYMBOL::OR && n != SYMBOL::CLOSE_PAR && !in(SYMBOL::operators, n)){
+        if (c != SYMBOL::OPEN_PAR && c != SYMBOL::OR && n != SYMBOL::CLOSE_PAR &&
+            n != SYMBOL::OR && n != SYMBOL::CONCATENATION && n != SYMBOL::ZEROORMORE && n != SYMBOL::ZEROORONE && n != SYMBOL::ONEORMORE){
             temp += SYMBOL::CONCATENATION;
         }
     }
