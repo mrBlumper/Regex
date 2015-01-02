@@ -20,23 +20,24 @@ struct RegexRepetition{
 class RegexFormater
 {
     public:
-        RegexFormater(std::string regex, bool use_brackets = true);
+        RegexFormater(std::string regex);
         virtual ~RegexFormater();
 
         std::string getPreviousGroup(const unsigned int pos);
         void        treatSpecialCharacters();
         void        replaceGroups();
         void        createDuplicatas();
+        void        convertToShort();
         void        convert();
 
         std::string getStr(){return _current;}
+        std::vector<short>  getFinalRep(){return _temp_shorts;}
         void debug();
     protected:
         std::string _current;
         std::vector<short>  _temp_shorts;
         bool    _conversion;
     private:
-        bool        _use_brackets;
         int         findBestReplace(int index);
         RegexRepetition treatRepetition(int index);
 };

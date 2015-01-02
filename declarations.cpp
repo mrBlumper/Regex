@@ -20,6 +20,8 @@ bool symbolCorresponds(const short symbol, const char c){
 
 /*Create a range [down up]*/
 short makeRange(const char down, const char up){
+    if (up == down)
+        return up;
     short temp = up;
     temp <<= 8;
     temp += down;
@@ -94,7 +96,7 @@ namespace SYMBOL{
                                                            ReplacedExpression("[:graph:]", {"[!-",toStr((char)127),"]"}),
                                                            ReplacedExpression("[:lower:]", "[a-z]"),
                                                            ReplacedExpression("[:print:]", {"[ -",toStr((char)127),"]"}),
-                                                           ReplacedExpression("[:punct:]", "[<>,?;.:/!§*µù%$£¤¨=+})\\]°@^_`|-[({'\"#~\\&]"),
+                                                           ReplacedExpression("[:punct:]", "[<>,?;.:/!§*µù%$£¤¨=+})\\]°@^_`|[({'\"#~\\&-]"),
                                                            ReplacedExpression("[:space:]", {"[ \t",toStr((char)12),toStr((char)11),"]"}),
                                                            ReplacedExpression("[:upper:]", "[A-Z]"),
                                                            ReplacedExpression("[:xdigit:]", "[0-9a-fA-F]")};

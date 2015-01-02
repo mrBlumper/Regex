@@ -1,12 +1,82 @@
 #include "RegexFormater.h"
 
-RegexFormater::RegexFormater(std::string regex, bool use_brackets):
-    _current(regex), _use_brackets(use_brackets)
+RegexFormater::RegexFormater(std::string regex):
+    _current(regex)
 {
     //ctor
 }
 
+void RegexFormater::convert(){
+    this->treatSpecialCharacters();
+    this->replaceGroups();
+    this->createDuplicatas();
+    this->convertToShort();
+}
 
+void RegexFormater::convertToShort(){
+    std::vector<short> expression;
+    bool in_bracket = false;
+    bool brackets_content[128] = {0};
+    bool inverse = false;
+    for (auto it = this->_current.begin(); it != this->_current.end(); ++it){
+        if (!in_bracket){
+            short temp = *it;
+            if (*it == SYMBOL::OPEN_BRACKET){
+                for (int i = 0; i < 128; ++i)
+                    brackets_content[i] = 0;
+                in_bracket = true;
+                if (*std::next(it) == '^'){
+                    inverse = true;
+                    ++it;
+                } else {
+                    inverse = false;
+                }
+                temp = SYMBOL::OPEN_PAR;
+            }
+            expression.push_back(temp);
+        } else {
+            if (*it == SYMBOL::CLOSE_BRACKET){
+                for (int i = 0; i < 128; ++i){
+                    if (brackets_content[i] == !inverse){
+                        char begin = i;
+                        while (i+1 < 128 && brackets_content[i+1] == !inverse){ ++i; }
+                        expression.push_back(makeRange(begin, i));
+                        expression.push_back(SYMBOL::OR);
+                    }
+                }
+                expression[expression.size() - 1] = SYMBOL::CLOSE_PAR;
+                in_bracket = false;
+            } else {
+                auto previous = std::prev(it);
+                auto next = std::next(it);
+                if (*it == '-' && previous != this->_current.end() && next != this->_current.end() && *previous != SYMBOL::OPEN_BRACKET && *next != SYMBOL::CLOSE_BRACKET && *previous != '^'){
+                    for (int i = *previous; i <= *next; ++i)
+                        brackets_content[i] = 1;
+                } else {
+                    brackets_content[*it] = 1;
+                }
+            }
+        }
+    }
+
+    std::string out = "";
+    std::map<char, char> reversed;
+    for (auto it = SYMBOL::special_chars.begin(); it != SYMBOL::special_chars.end(); ++it){
+        reversed[it->second] = it->first;
+    }
+    for (auto &c : expression){
+        if (isRange(c)){
+            std::cout<<"[ RANGE : "<<(char)(c&0xff)<<" "<<(char)(c>>8)<<" ]\n";
+        } else {
+            if (SYMBOL::isOp((char)c)){
+                std::cout<<"[ OPERATOR : "<<reversed[(char)c]<<" ]\n";
+            } else {
+                std::cout<<"[ "<<(char)c<<" ]\n";
+            }
+        }
+    }
+    _temp_shorts = expression;
+}
 
 void  RegexFormater::createDuplicatas(){
     std::string temp = "";
@@ -16,12 +86,12 @@ void  RegexFormater::createDuplicatas(){
             RegexRepetition repetition = this->treatRepetition(i);
 
             if (repetition.size == 0 || (repetition.min >= repetition.max && repetition.min && repetition.max)){
-                    std::cout<<"bad\n";
+                    //std::cout<<"bad\n";
                 temp += this->_current[i];
                 i++;
             } else {
-                std::cout<<repetition.size<<" "<<repetition.min<<" "<<repetition.max<<"\n";
-                std::cout<<"previous group is: "<<this->getPreviousGroup(i)<<"\n";
+                /*std::cout<<repetition.size<<" "<<repetition.min<<" "<<repetition.max<<"\n";
+                std::cout<<"previous group is:  "<<this->getPreviousGroup(i)<<"\n";*/
                 std::string previous = this->getPreviousGroup(i);
                 for (int r = 1; r < repetition.min; r++){
                     temp += previous;
@@ -103,13 +173,11 @@ void RegexFormater::replaceGroups(){
             continue;*/
             //std::cout<<SYMBOL::replace_expressions[i].pattern<<"\n";
         RegexFormater f1(SYMBOL::replace_expressions[i].pattern);
-            f1.treatSpecialCharacters();
-            SYMBOL::replace_expressions[i].pattern = f1.getStr();
-            RegexFormater f2(SYMBOL::replace_expressions[i].translate);
-            f2.treatSpecialCharacters();
-            SYMBOL::replace_expressions[i].translate = f2.getStr();
-            f1.debug();
-            f2.debug();
+        f1.treatSpecialCharacters();
+        SYMBOL::replace_expressions[i].pattern = f1.getStr();
+        RegexFormater f2(SYMBOL::replace_expressions[i].translate);
+        f2.treatSpecialCharacters();
+        SYMBOL::replace_expressions[i].translate = f2.getStr();
         /*std::string temp = SYMBOL::replace_expressions[i].pattern;
         std::string temp_2 = SYMBOL::replace_expressions[i].translate;
         SYMBOL::replace_expressions[i].pattern = "";
@@ -185,7 +253,7 @@ void RegexFormater::treatSpecialCharacters(){
             to_add = c;
         }
 
-        if (to_add == SYMBOL::OPEN_BRACKET && this->_use_brackets && !in_bracket){
+        if (to_add == SYMBOL::OPEN_BRACKET && !in_bracket){
                 in_bracket = true;
                 //std::cout<<"deb\n";
         } else if (to_add == SYMBOL::CLOSE_BRACKET && in_bracket){
@@ -226,6 +294,14 @@ std::string RegexFormater::getPreviousGroup(const unsigned int pos){
                 break;
             }
         }
+        for (auto &c : output){
+            if (c == SYMBOL::OPEN_PAR)  std::cout<<"(";
+            else if (c == SYMBOL::CLOSE_PAR)  std::cout<<")";
+            else if (c == SYMBOL::OR)  std::cout<<"|";
+            else    std::cout<<c;
+        }
+        std::cout<<"\n";
+        //std::cout<<"-----"<<output<<"\n";
         return output;
     } else {
         output = this->_current[pos - 1];

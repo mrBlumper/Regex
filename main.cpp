@@ -34,14 +34,15 @@ int main(){
     f.treatSpecialCharacters();
     f.createDuplicatas();
     f.debug();//*/
-    RegexFormater f("\\e[^za()z[b\\e\\]r]");
+    RegexFormater f("$(bo\\(nj[:punct:](az|ze){4,6}))+");
     //RegexFormater f("\\.zr$e\\$r[:punct:]e[^za()z[e\\]r]z.t");
     f.treatSpecialCharacters();
-    f.debug();
+    //f.debug();
     f.replaceGroups();
     f.createDuplicatas();
     f.debug();
 
+f.convertToShort();
 
     /*
     for (auto it = SYMBOL::replace_expressions.begin(); it != SYMBOL::replace_expressions.end(); ++it){
