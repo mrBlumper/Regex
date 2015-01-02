@@ -1,7 +1,7 @@
 #include "RegexFormater.h"
 
-RegexFormater::RegexFormater(std::string regex):
-    _current(regex)
+RegexFormater::RegexFormater(std::string regex, bool use_brackets):
+    _current(regex), _use_brackets(use_brackets)
 {
     //ctor
 }
@@ -97,11 +97,20 @@ int RegexFormater::findBestReplace(int index){
     return temp;
 }
 
-void RegexFormater::replaceGroups(){/*
+void RegexFormater::replaceGroups(){
     for (int i = 0; i < SYMBOL::replace_expressions.size(); ++i){
-        if (!SYMBOL::replace_expressions[i].convert)
-            continue;
-        std::string temp = SYMBOL::replace_expressions[i].pattern;
+        /*if (!SYMBOL::replace_expressions[i].convert)
+            continue;*/
+            //std::cout<<SYMBOL::replace_expressions[i].pattern<<"\n";
+        RegexFormater f1(SYMBOL::replace_expressions[i].pattern);
+            f1.treatSpecialCharacters();
+            SYMBOL::replace_expressions[i].pattern = f1.getStr();
+            RegexFormater f2(SYMBOL::replace_expressions[i].translate);
+            f2.treatSpecialCharacters();
+            SYMBOL::replace_expressions[i].translate = f2.getStr();
+            f1.debug();
+            f2.debug();
+        /*std::string temp = SYMBOL::replace_expressions[i].pattern;
         std::string temp_2 = SYMBOL::replace_expressions[i].translate;
         SYMBOL::replace_expressions[i].pattern = "";
         SYMBOL::replace_expressions[i].translate = "";
@@ -116,9 +125,8 @@ void RegexFormater::replaceGroups(){/*
                 SYMBOL::replace_expressions[i].translate += SYMBOL::special_chars[c];
             else
                 SYMBOL::replace_expressions[i].translate += c;
-        }
-    }*/
-    std::cout<<this->_current<<"\n";
+        }*/
+    }
     std::string temp = "";
     int i = 0;
     while (i < this->_current.size()){
@@ -153,21 +161,45 @@ void RegexFormater::debug(){
 
 void RegexFormater::treatSpecialCharacters(){
     std::string temp = "";
+    std::string in_brackets_content = "";
+    bool in_bracket = false;
+    char to_add = ' ';
+    bool escaped = false;
+    //std::cout<<this->_current<<"\n";
     for (int i = 0; i < this->_current.size(); i++){
         char c = this->_current[i];
+        escaped = false;
         if (c == '\\'){
             if (i == this->_current.size() - 1)
                 break;
-                std::cout<<this->_current[i+1]<<"\n";
-            if (in(SYMBOL::escaped_char, this->_current[i+1])){
-                temp += this->_current[++i];
-                continue;
-            }
+            escaped = true;
+                //std::cout<<this->_current[i+1]<<"\n";
+            /*if (in(SYMBOL::escaped_char, this->_current[i+1])){
+                to_add = this->_current[++i];
+                //continue;
+            }*/
+            to_add = this->_current[++i];
         } else if (SYMBOL::special_chars.find(c) != SYMBOL::special_chars.end()){
-            temp += SYMBOL::special_chars[c];
+            to_add = SYMBOL::special_chars[c];
         } else {
-            temp += c;
+            to_add = c;
         }
+
+        if (to_add == SYMBOL::OPEN_BRACKET && this->_use_brackets && !in_bracket){
+                in_bracket = true;
+                //std::cout<<"deb\n";
+        } else if (to_add == SYMBOL::CLOSE_BRACKET && in_bracket){
+            in_bracket = false;
+        } else if (in_bracket){//std::cout<<escaped<<" "<<to_add<<"\n";
+            if (SYMBOL::isOp(to_add))
+                to_add = c;
+            if (escaped && to_add != ']'){
+                to_add = '\\';
+                --i;
+            }
+        }
+            //std::cout<<escaped<<" "<<to_add<<"\n";
+        temp += to_add;
     }
     this->_current = temp;
 }

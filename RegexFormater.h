@@ -20,7 +20,7 @@ struct RegexRepetition{
 class RegexFormater
 {
     public:
-        RegexFormater(std::string regex);
+        RegexFormater(std::string regex, bool use_brackets = true);
         virtual ~RegexFormater();
 
         std::string getPreviousGroup(const unsigned int pos);
@@ -36,6 +36,7 @@ class RegexFormater
         std::vector<short>  _temp_shorts;
         bool    _conversion;
     private:
+        bool        _use_brackets;
         int         findBestReplace(int index);
         RegexRepetition treatRepetition(int index);
 };

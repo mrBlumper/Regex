@@ -6,6 +6,8 @@
 #include <iostream>
 #include <map>
 
+class RegexFormater;
+
 std::string toStr(char c);
 inline bool isRange(const short symbol);
 bool symbolCorresponds(const short symbol, const char c);
@@ -59,6 +61,13 @@ namespace SYMBOL{
 
             if (!convert)
                 return;
+            /*RegexFormater f1(pattern);
+            f1.treatSpecialCharacters();
+            pattern = f1.getStr();
+            RegexFormater f2(translate);
+            f2.treatSpecialCharacters();
+            translate = f2.getStr();*/
+                /*
             pattern = "";
             translate = "";
             for (auto& c : p){
@@ -72,16 +81,18 @@ namespace SYMBOL{
                     translate += special_chars[c];
                 else
                     translate += c;
-            }
+            }*/
         }
         ReplacedExpression(std::string p, std::initializer_list<std::string> t, bool c = true){
-            /*pattern = p;
-            translate = "";*/
+            pattern = p;
+            translate = "";
             std::string temp = "";
             for (auto& e : t)
                 temp += e;
-            ReplacedExpression(p, temp, c);
-            //convert = c;
+            //    std::cout<<p<<" "<<temp<<"\n";
+            translate = temp;
+            //ReplacedExpression(p, temp, c);
+            convert = c;
         }
         std::string pattern;
         std::string translate;

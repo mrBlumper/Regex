@@ -34,7 +34,8 @@ int main(){
     f.treatSpecialCharacters();
     f.createDuplicatas();
     f.debug();//*/
-    RegexFormater f("\\.zr$e\\$r[:digits:]e[^zazer]z.t");
+    RegexFormater f("\\e[^za()z[b\\e\\]r]");
+    //RegexFormater f("\\.zr$e\\$r[:punct:]e[^za()z[e\\]r]z.t");
     f.treatSpecialCharacters();
     f.debug();
     f.replaceGroups();
