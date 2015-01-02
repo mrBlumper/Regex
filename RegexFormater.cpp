@@ -97,7 +97,28 @@ int RegexFormater::findBestReplace(int index){
     return temp;
 }
 
-void RegexFormater::replaceGroups(){
+void RegexFormater::replaceGroups(){/*
+    for (int i = 0; i < SYMBOL::replace_expressions.size(); ++i){
+        if (!SYMBOL::replace_expressions[i].convert)
+            continue;
+        std::string temp = SYMBOL::replace_expressions[i].pattern;
+        std::string temp_2 = SYMBOL::replace_expressions[i].translate;
+        SYMBOL::replace_expressions[i].pattern = "";
+        SYMBOL::replace_expressions[i].translate = "";
+        for (auto& c : temp){
+            if (SYMBOL::special_chars.find(c) != SYMBOL::special_chars.end()){
+                SYMBOL::replace_expressions[i].pattern += SYMBOL::special_chars[c];
+            }else
+                SYMBOL::replace_expressions[i].pattern += c;
+        }
+        for (auto& c : temp_2){
+            if (SYMBOL::special_chars.find(c) != SYMBOL::special_chars.end())
+                SYMBOL::replace_expressions[i].translate += SYMBOL::special_chars[c];
+            else
+                SYMBOL::replace_expressions[i].translate += c;
+        }
+    }*/
+    std::cout<<this->_current<<"\n";
     std::string temp = "";
     int i = 0;
     while (i < this->_current.size()){
@@ -137,6 +158,7 @@ void RegexFormater::treatSpecialCharacters(){
         if (c == '\\'){
             if (i == this->_current.size() - 1)
                 break;
+                std::cout<<this->_current[i+1]<<"\n";
             if (in(SYMBOL::escaped_char, this->_current[i+1])){
                 temp += this->_current[++i];
                 continue;

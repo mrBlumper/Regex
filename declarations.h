@@ -24,20 +24,8 @@ bool in(const std::string str, const char element);
 //constants
 namespace SYMBOL{
     bool isOp(char c);
-    struct ReplacedExpression{
-        ReplacedExpression(std::string p, std::string t){
-            pattern = p;
-            translate = t;
-        }
-        ReplacedExpression(std::string p, std::initializer_list<std::string> t){
-            pattern = p;
-            translate = "";
-            for (auto& e : t)
-                translate += e;
-        }
-        std::string pattern;
-        std::string translate;
-    };
+    struct ReplacedExpression;
+
     extern char BEGIN_WORD;
     extern char END_WORD;
     extern char CONCATENATION;
@@ -61,6 +49,44 @@ namespace SYMBOL{
     extern std::vector<char> operators;
     extern std::map<char, char> special_chars;
     extern std::vector<ReplacedExpression> replace_expressions;
+
+
+    struct ReplacedExpression{
+        ReplacedExpression(std::string p, std::string t, bool c = true){
+            pattern = p;
+            translate = t;
+            convert = c;
+
+            if (!convert)
+                return;
+            pattern = "";
+            translate = "";
+            for (auto& c : p){
+                if (special_chars.find(c) != special_chars.end()){
+                    pattern += special_chars[c];
+                }else
+                    pattern += c;
+            }
+            for (auto& c : t){
+                if (special_chars.find(c) != special_chars.end())
+                    translate += special_chars[c];
+                else
+                    translate += c;
+            }
+        }
+        ReplacedExpression(std::string p, std::initializer_list<std::string> t, bool c = true){
+            /*pattern = p;
+            translate = "";*/
+            std::string temp = "";
+            for (auto& e : t)
+                temp += e;
+            ReplacedExpression(p, temp, c);
+            //convert = c;
+        }
+        std::string pattern;
+        std::string translate;
+        bool convert;
+    };
 }
 
 

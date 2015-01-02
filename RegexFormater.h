@@ -34,6 +34,7 @@ class RegexFormater
     protected:
         std::string _current;
         std::vector<short>  _temp_shorts;
+        bool    _conversion;
     private:
         int         findBestReplace(int index);
         RegexRepetition treatRepetition(int index);

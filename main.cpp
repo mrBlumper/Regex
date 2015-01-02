@@ -28,12 +28,19 @@ std::string transformBracketOp(std::string content){
 int main(){
     std::cout<<transformBracketOp("A-Z-");
 
-
+/*
     RegexFormater f("(blah){2,}mm");
     f.replaceGroups();
     f.treatSpecialCharacters();
     f.createDuplicatas();
+    f.debug();//*/
+    RegexFormater f("\\.zr$e\\$r[:digits:]e[^zazer]z.t");
+    f.treatSpecialCharacters();
     f.debug();
+    f.replaceGroups();
+    f.createDuplicatas();
+    f.debug();
+
 
     /*
     for (auto it = SYMBOL::replace_expressions.begin(); it != SYMBOL::replace_expressions.end(); ++it){

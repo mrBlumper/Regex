@@ -70,19 +70,23 @@ namespace SYMBOL{
     char OPEN_PAR='(';
     char CLOSE_PAR=')';
 //*/
-    std::string escaped_char = R"(\^$.|?*+()[]{})"; //raw string litteral
+    std::string escaped_char = R"(\^$|?*.+()[]{})"; //raw string litteral
     std::vector<char> operators = {CONCATENATION, ZEROORMORE, ONEORMORE, ZEROORMORE, OR};
     std::map<char, char> special_chars = {{'(', OPEN_PAR}, {')', CLOSE_PAR}, {'[', OPEN_BRACKET}, {']', CLOSE_BRACKET}, {'{', OPEN_CURLY}, {'}', CLOSE_CURLY},
-                                          {'*', ZEROORMORE}, {'+', ONEORMORE}, {'?', ZEROORONE}, {'$', DOLLAR}, {'^', CARET}, {'|', OR}};
+                                          {'*', ZEROORMORE}, {'+', ONEORMORE}, {'?', ZEROORONE}, {'$', DOLLAR}, {'^', CARET}, {'|', OR}, {'.', CONCATENATION}};
     std::vector<ReplacedExpression> replace_expressions = {ReplacedExpression(".", {"[\t",toStr((char)21),"-",toStr((char)127),"]"}),
-                                                           ReplacedExpression("$", ""+END_WORD),
+                                                           ReplacedExpression("$", {END_WORD}),
                                                            ReplacedExpression("^", {BEGIN_WORD}),
+                                                           ReplacedExpression("[^", "[^"),          //these four are made to protect from remplacement
+                                                           ReplacedExpression("\\^", "^", false),
+                                                           ReplacedExpression("\\.", ".", false),
+                                                           ReplacedExpression("\\$", "$", false),
                                                            ReplacedExpression("\\d", "[0-9]"),
                                                            ReplacedExpression("\\D", "[^0-9]"),
                                                            ReplacedExpression("\\w", "[_A-Za-z0-9]"),
                                                            ReplacedExpression("\\W", "[^_A-Za-z0-9]"),
-                                                           ReplacedExpression("\\s", {"[\n\t\r ",toStr((char)12),toStr((char)11),"]"}),
-                                                           ReplacedExpression("\\S", {"[^\n\t\r ",toStr((char)12),toStr((char)11),"]"}),
+                                                           ReplacedExpression("\\s", {"[\n\t ",toStr((char)12),toStr((char)11),"]"}),
+                                                           ReplacedExpression("\\S", {"[^\n\t ",toStr((char)12),toStr((char)11),"]"}),
                                                            ReplacedExpression("[:alnum:]", "[a-zA-Z0-9]"),
                                                            ReplacedExpression("[:alpha:]", "[a-zA-Z]"),
                                                            ReplacedExpression("[:blank:]", "[\t ]"),
@@ -91,7 +95,7 @@ namespace SYMBOL{
                                                            ReplacedExpression("[:lower:]", "[a-z]"),
                                                            ReplacedExpression("[:print:]", {"[ -",toStr((char)127),"]"}),
                                                            ReplacedExpression("[:punct:]", "[<>,\\?;.:/!§\\*µù%\\$£¤¨=\\+\\}\\)\\]°@\\^_`\\|-\\[\\(\\{'\"#~\\\\&]"),
-                                                           ReplacedExpression("[:space:]", {"[ \r\t",toStr((char)12),toStr((char)11),"]"}),
+                                                           ReplacedExpression("[:space:]", {"[ \t",toStr((char)12),toStr((char)11),"]"}),
                                                            ReplacedExpression("[:upper:]", "[A-Z]"),
                                                            ReplacedExpression("[:xdigit:]", "[0-9a-fA-F]")};
 }
