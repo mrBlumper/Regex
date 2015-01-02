@@ -6,10 +6,25 @@ RegexFormater::RegexFormater(std::string regex):
     //ctor
 }
 
+void RegexFormater::setExplicitConcat(){
+    std::string temp;
+    for (int i = 0; i < this->_current.size() - 1; i++){
+        char c = this->_current[i];
+        temp += c;
+        char n = this->_current[i+1];
+        if (c != SYMBOL::OPEN_PAR && c != SYMBOL::OR && n != SYMBOL::CLOSE_PAR && !in(SYMBOL::operators, n)){
+            temp += SYMBOL::CONCATENATION;
+        }
+    }
+    temp += this->_current[this->_current.size() - 1];
+    this->_current = temp;
+}
+
 void RegexFormater::convert(){
     this->treatSpecialCharacters();
     this->replaceGroups();
     this->createDuplicatas();
+    this->setExplicitConcat();
     this->convertToShort();
 }
 
@@ -58,7 +73,7 @@ void RegexFormater::convertToShort(){
             }
         }
     }
-
+/*
     std::string out = "";
     std::map<char, char> reversed;
     for (auto it = SYMBOL::special_chars.begin(); it != SYMBOL::special_chars.end(); ++it){
@@ -74,7 +89,7 @@ void RegexFormater::convertToShort(){
                 std::cout<<"[ "<<(char)c<<" ]\n";
             }
         }
-    }
+    }*/
     _temp_shorts = expression;
 }
 

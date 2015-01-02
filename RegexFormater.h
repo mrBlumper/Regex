@@ -29,6 +29,7 @@ class RegexFormater
         void        createDuplicatas();
         void        convertToShort();
         void        convert();
+        void        setExplicitConcat();
 
         std::string getStr(){return _current;}
         std::vector<short>  getFinalRep(){return _temp_shorts;}

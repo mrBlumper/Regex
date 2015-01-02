@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <stack>
 
 class RegexFormater;
 
@@ -21,6 +22,47 @@ bool in(std::vector<T> list, T element){
     return false;
 }
 bool in(const std::string str, const char element);
+
+template <typename T>
+std::vector<T> convertToPostfix(std::vector<T> expression, T open_par, T close_par, int (*precedence)(T) ){
+    std::vector<T> output;
+    std::stack<T> stack;
+
+    for (auto &c : expression){
+        if (c == open_par){
+            stack.push(c);
+        } else if (c == close_par) {
+            while (!stack.empty() && stack.top() != open_par){
+                output.push_back(stack.top());
+                stack.pop();
+            }
+            if (!stack.empty()){
+                stack.pop();
+            } else {
+                std::cout<<"ERREUR DE PARANTHESE\n";
+                return std::vector<T>();
+            }
+        } else {
+            while (!stack.empty()){
+                T last = stack.top();
+                if (precedence(last) >= precedence(c)){
+                    output.push_back(last);
+                    stack.pop();
+                } else {
+                    break;
+                }
+            }
+            stack.push(c);
+        }
+    }
+
+    while (!stack.empty()){
+        output.push_back(stack.top());
+        stack.pop();
+    }
+
+    return output;
+}
 
 
 //constants

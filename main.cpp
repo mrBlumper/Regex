@@ -11,6 +11,7 @@ using namespace std;
 
 //#include "declarations.h"
 #include "RegexFormater.h"
+#include "Regex.h"
 //\n->10
 //\t->9
 
@@ -34,15 +35,13 @@ int main(){
     f.treatSpecialCharacters();
     f.createDuplicatas();
     f.debug();//*/
-    RegexFormater f("$(bo\\(nj[:punct:](az|ze){4,6}))+");
+    /*
+    RegexFormater f("(aett)(az)");
     //RegexFormater f("\\.zr$e\\$r[:punct:]e[^za()z[e\\]r]z.t");
-    f.treatSpecialCharacters();
-    //f.debug();
-    f.replaceGroups();
-    f.createDuplicatas();
-    f.debug();
+    f.convert();*/
 
-f.convertToShort();
+    Regex regex("bon(jour|soir)");
+    regex.compile();
 
     /*
     for (auto it = SYMBOL::replace_expressions.begin(); it != SYMBOL::replace_expressions.end(); ++it){
