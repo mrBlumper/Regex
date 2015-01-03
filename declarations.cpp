@@ -62,16 +62,6 @@ namespace SYMBOL{
     char OPEN_CURLY     = 17;   // '{'
     char CLOSE_CURLY    = 18;   // '}'
     char INTERVAL       = 20;   // '}'
-    //*/
-/*
-    char CONCATENATION='.';
-    char ZEROORMORE='*';
-    char ONEORMORE='+';
-    char ZEROORONE='?';
-    char OR='|';
-    char OPEN_PAR='(';
-    char CLOSE_PAR=')';
-//*/
     std::string escaped_char = R"(\^$|?*.+()[]{})"; //raw string litteral
     std::vector<char> operators = {CONCATENATION, ZEROORMORE, ONEORMORE, ZEROORMORE, OR};
     std::map<char, char> special_chars = {{'(', OPEN_PAR}, {')', CLOSE_PAR}, {'[', OPEN_BRACKET}, {']', CLOSE_BRACKET}, {'{', OPEN_CURLY}, {'}', CLOSE_CURLY},
@@ -79,10 +69,6 @@ namespace SYMBOL{
     std::vector<ReplacedExpression> replace_expressions = {ReplacedExpression(".", {"[\t",toStr((char)21),"-",toStr((char)127),"]"}),
                                                            ReplacedExpression("$", toStr(END_WORD)),
                                                            ReplacedExpression("^", toStr(BEGIN_WORD)),
-                                                           //ReplacedExpression("[^", "[^"),          //these four are made to protect from remplacement
-                                                           /*ReplacedExpression("\\^", "^", false),
-                                                           ReplacedExpression("\\.", ".", false),
-                                                           ReplacedExpression("\\$", "$", false),*/
                                                            ReplacedExpression("\\\\d", "[0-9]"),
                                                            ReplacedExpression("\\\\D", "[^0-9]"),
                                                            ReplacedExpression("\\\\w", "[_A-Za-z0-9]"),

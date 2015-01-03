@@ -10,47 +10,6 @@ bool operator==(const DFALink& lhs, const DFALink& rhs){
     return true;
 }
 
-std::vector<unsigned int>   findEpsilons(std::vector<unsigned int> &nodes, NFA &nfa){
-    std::vector<unsigned int> results;
-    std::stack<unsigned int> stack;
-    std::map<unsigned int, bool> cache;
-    for (auto& n : nodes){
-        results.push_back(n);
-        stack.push(n);
-        cache[n] = true;
-    }
-    while (!stack.empty()){
-        unsigned int current = POP(stack);
-        cache [current] = true;
-
-        for (auto& n : nfa.nodes[current]){
-            if (!n.c && cache.find(n.to) == cache.end()){
-                stack.push(n.to);
-                results.push_back(n.to);
-            }
-        }
-    }
-    return results;
-}
-
-
-std::vector<unsigned int>   move_NFA(std::vector<unsigned int> &nodes, short symbol, NFA &nfa){
-    std::vector<unsigned int> results;
-    for (auto& n : nodes){
-        for (auto& link : nfa.nodes[n]){
-            if (symbolCorresponds(link.c, symbol)){
-                results.push_back(link.to);
-            }
-        }
-    }
-    return results;
-}
-
-
-std::vector<unsigned int>   move_DFA(std::vector<unsigned int> &nodes, short symbol, NFA &nfa){
-    std::vector<unsigned int> temp = move_NFA(nodes, symbol, nfa);
-    return findEpsilons(temp, nfa);
-}
 
 DFALink::DFALink(std::vector<unsigned int> ids, unsigned int end){
     this->_end = false;
@@ -61,14 +20,7 @@ DFALink::DFALink(std::vector<unsigned int> ids, unsigned int end){
             this->_end = true;
     }
     this->ids = ids;
-    std::sort(this->ids.begin(), this->ids.end());/*
-    if (this->_sum){
-            std::cout<<end<<"\n";
-            for (auto & e : ids)
-                std::cout<<e<<" ";
-            std::cout<<"\n";
-            std::cout<<this->_end<<"\n";
-    }//*/
+    std::sort(this->ids.begin(), this->ids.end());
 }
 
 
@@ -83,9 +35,7 @@ void DFA::show(){
     std::ofstream file;
     file.open ("dfa.gv");
     file << "digraph{\n";
-
     for (int i = 0; i < this->links.size(); ++i){
-
         file<<"    "<<i<<" [label="<<i<<" shape="<<((this->links[i].isEnd())?"doublecircle":"circle")<<"]\n";
         for (auto it = this->links[i].out.begin(); it != this->links[i].out.end(); ++it){
             short c = it->first;
@@ -107,30 +57,26 @@ void DFA::show(){
         }
     }
     file<<"}\n";
-
     file.close();
     system("dot -Tpng -odfa.png dfa.gv");
     system("dfa.png");
 }
 
 void DFA::build(NFA &nfa){
-    std::cout<<"creating dfa\n";
     std::vector<unsigned int> first_node = {nfa.start};
-    this->links.push_back(DFALink(findEpsilons(first_node, nfa), nfa.end));
+    this->links.push_back(DFALink(nfa.findEpsilons(first_node), nfa.end));
     std::stack<unsigned int> stack;
     stack.push(0);
-
     while (!stack.empty()){
         unsigned int current = POP(stack);
         for (char c = 1; c < 127; c++){
-            std::vector<unsigned int> temp_ids = move_DFA(this->links[current].ids, c, nfa);
+            std::vector<unsigned int> temp_ids = nfa.move_DFA(this->links[current].ids, c);
             DFALink temp(temp_ids, nfa.end);
             if (!temp_ids.size()){
                 continue;
             }
             int pos = this->find(temp);
             if (pos < 0){
-                std::cout<<"not found\n";
                 this->links.push_back(temp);
                 stack.push(this->links.size() - 1);
                 pos = stack.top();

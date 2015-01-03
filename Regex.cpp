@@ -14,73 +14,49 @@ int REGEX_precedence(short c){
     }
 }
 
-int Regex::match(std::string m){
-    if (this->_start_symbol){
-        m.insert(0, toStr(SYMBOL::BEGIN_WORD));
-    } else if (this->_end_symbol){
-        m += SYMBOL::END_WORD;
+bool Regex::match(std::string m){
+    return this->find(m) == m.size();
+}
+
+
+int Regex::find(std::string m, bool change){
+    if (!this->_compiled) {
+        this->compile();
+    }
+    if (change) {
+        if (this->_start_symbol){
+            m.insert(0, toStr(SYMBOL::BEGIN_WORD));
+        } else if (this->_end_symbol){
+            m += SYMBOL::END_WORD;
+        }
     }
     unsigned int state = 0;
     int end = -1;
     for (int i = 0; i < m.size(); i++){
         char c = m[i];
-    std::cout<<state<<" "<<c<<"\n";
         if (_dfa.links[state].out.find(c) == _dfa.links[state].out.end()){
-                std::cout<<"quit\n";
             break;
         }
         if (_dfa.links[_dfa.links[state].out[c]].isEnd()){
-                std::cout<<"end\n";
             end = i + 1;
         }
         state = _dfa.links[state].out[c];
     }
-    end -= this->_end_symbol;
+    if (change)
+        end -= (this->_end_symbol + this->_start_symbol);
     return end;
 }
 
 Regex::Regex(std::string reg):
-    _base(reg), _end_symbol(false), _start_symbol(false)
+    _base(reg), _end_symbol(false), _start_symbol(false), _compiled (false)
 {
     //ctor
 }
 
 void Regex::compile(){
+    this->_compiled = true;
     this->format();
-    std::map<char, char> reversed;
-    for (auto it = SYMBOL::special_chars.begin(); it != SYMBOL::special_chars.end(); ++it){
-        reversed[it->second] = it->first;
-    }
-    for (auto &c : this->_formated){
-        if (isRange(c)){
-            std::cout<<"[ RANGE : "<<(char)(c&0xff)<<" "<<(char)(c>>8)<<" ]\n";
-        } else {
-            if (SYMBOL::isOp((char)c)){
-                std::cout<<"[ OPERATOR : "<<reversed[(char)c]<<" ]\n";
-            } else {
-                std::cout<<"[ "<<(char)c<<" ]\n";
-            }
-        }
-    }
-    this->toPostfix();/*
-    std::cout<<"postfix\n";*/
-    for (auto &c : this->_postfix){
-        if (c == SYMBOL::BEGIN_WORD){
-            this->_start_symbol = true;
-        }
-        else if (c == SYMBOL::END_WORD){
-            this->_end_symbol = true;
-        }
-        /*if (isRange(c)){
-            std::cout<<"[ RANGE : "<<(char)(c&0xff)<<" "<<(char)(c>>8)<<" ]\n";
-        } else {
-            if (SYMBOL::isOp((char)c)){
-                std::cout<<"[ OPERATOR : "<<reversed[(char)c]<<" ]\n";
-            } else {
-                std::cout<<"[ "<<(char)c<<" ]\n";
-            }
-        }*/
-    }
+    this->toPostfix();
     _nfa.build(this->_postfix);
     //_nfa.show();
     _dfa.build(_nfa);
@@ -94,23 +70,7 @@ void Regex::format(){
 }
 
 void Regex::toPostfix(){
-    this->_postfix = convertToPostfix<short>(_formated, (short)SYMBOL::OPEN_PAR, SYMBOL::CLOSE_PAR, REGEX_precedence);/*
-
-    std::map<char, char> reversed;
-    for (auto it = SYMBOL::special_chars.begin(); it != SYMBOL::special_chars.end(); ++it){
-        reversed[it->second] = it->first;
-    }
-    for (auto &c : this->_postfix){
-        if (isRange(c)){
-            std::cout<<"[ RANGE : "<<(char)(c&0xff)<<" "<<(char)(c>>8)<<" ]\n";
-        } else {
-            if (SYMBOL::isOp((char)c)){
-                std::cout<<"[ OPERATOR : "<<reversed[(char)c]<<" ]\n";
-            } else {
-                std::cout<<"[ "<<(char)c<<" ]\n";
-            }
-        }
-    }*/
+    this->_postfix = convertToPostfix<short>(_formated, (short)SYMBOL::OPEN_PAR, SYMBOL::CLOSE_PAR, REGEX_precedence);
 }
 
 Regex::~Regex()

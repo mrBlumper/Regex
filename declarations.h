@@ -55,12 +55,10 @@ std::vector<T> convertToPostfix(std::vector<T> expression, T open_par, T close_p
             stack.push(c);
         }
     }
-
     while (!stack.empty()){
         output.push_back(stack.top());
         stack.pop();
     }
-
     return output;
 }
 
@@ -78,7 +76,6 @@ namespace SYMBOL{
     extern char ZEROORONE;
     extern char BACKSLASH;
     extern char CARET;
-    //put space for char 9 & 10 ('\n' and '\t')
     extern char DOLLAR;
     extern char OR;
     extern char OPEN_PAR;
@@ -100,40 +97,13 @@ namespace SYMBOL{
             pattern = p;
             translate = t;
             convert = c;
-
-            if (!convert)
-                return;
-            /*RegexFormater f1(pattern);
-            f1.treatSpecialCharacters();
-            pattern = f1.getStr();
-            RegexFormater f2(translate);
-            f2.treatSpecialCharacters();
-            translate = f2.getStr();*/
-                /*
-            pattern = "";
-            translate = "";
-            for (auto& c : p){
-                if (special_chars.find(c) != special_chars.end()){
-                    pattern += special_chars[c];
-                }else
-                    pattern += c;
-            }
-            for (auto& c : t){
-                if (special_chars.find(c) != special_chars.end())
-                    translate += special_chars[c];
-                else
-                    translate += c;
-            }*/
         }
         ReplacedExpression(std::string p, std::initializer_list<std::string> t, bool c = true){
             pattern = p;
-            translate = "";
             std::string temp = "";
             for (auto& e : t)
                 temp += e;
-            //    std::cout<<p<<" "<<temp<<"\n";
             translate = temp;
-            //ReplacedExpression(p, temp, c);
             convert = c;
         }
         std::string pattern;
