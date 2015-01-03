@@ -4,7 +4,7 @@ using namespace std;
 
 #include "Regex.h"
 
-/* a simple implementation of DFA
+/* a simple implementation of Regex
 Supports: -    + * ? | operators
           - [] & () & [^] groups
           - repetitions
