@@ -14,6 +14,25 @@ int REGEX_precedence(short c){
     }
 }
 
+int Regex::match(std::string m){
+    unsigned int state = 0;
+    int end = -1;
+    for (int i = 0; i < m.size(); i++){
+        char c = m[i];
+    std::cout<<state<<" "<<c<<"\n";
+        if (_dfa.links[state].out.find(c) == _dfa.links[state].out.end()){
+                std::cout<<"quit\n";
+            break;
+        }
+        if (_dfa.links[_dfa.links[state].out[c]].isEnd()){
+                std::cout<<"end\n";
+            end = i + 1;
+        }
+        state = _dfa.links[state].out[c];
+    }
+    return end;
+}
+
 Regex::Regex(std::string reg):
     _base(reg)
 {

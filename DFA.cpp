@@ -61,14 +61,14 @@ DFALink::DFALink(std::vector<unsigned int> ids, unsigned int end){
             this->_end = true;
     }
     this->ids = ids;
-    std::sort(this->ids.begin(), this->ids.end());
+    std::sort(this->ids.begin(), this->ids.end());/*
     if (this->_sum){
             std::cout<<end<<"\n";
             for (auto & e : ids)
                 std::cout<<e<<" ";
             std::cout<<"\n";
             std::cout<<this->_end<<"\n";
-    }
+    }//*/
 }
 
 

@@ -16,6 +16,7 @@ class Regex
         void format();
         void toPostfix();
         void compile();
+        int match(std::string m);
         virtual ~Regex();
     protected:
         std::string         _base;

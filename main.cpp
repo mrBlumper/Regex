@@ -40,8 +40,14 @@ int main(){
     //RegexFormater f("\\.zr$e\\$r[:punct:]e[^za()z[e\\]r]z.t");
     f.convert();*/
 
-    Regex regex("a*(b|cd?)+");
+    Regex regex("[A-Z]{2,4}");
     regex.compile();
+    std::string to_match = "AAA";
+    int pos = regex.match(to_match);
+    if (pos >= 0)
+    std::cout<<"find "<<pos<<" "<<to_match.substr(0, pos)<<"\n";
+    else
+        std::cout<<"not find\n";
 
     /*
     for (auto it = SYMBOL::replace_expressions.begin(); it != SYMBOL::replace_expressions.end(); ++it){
