@@ -24,7 +24,9 @@ void Regex::compile(){
     this->format();
     this->toPostfix();
     _nfa.build(this->_postfix);
-    _nfa.show();
+    //_nfa.show();
+    _dfa.build(_nfa);
+    _dfa.show();
 }
 
 void Regex::format(){

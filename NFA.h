@@ -16,10 +16,10 @@ T POP(std::stack<T> &s){
     return temp;
 }
 
-struct NFALink {
+struct NodeLink {
     short c;
     unsigned int to;
-    NFALink(unsigned int to, short c){
+    NodeLink(unsigned int to, short c){
         this->to = to;
         this->c = c;
     }
@@ -36,7 +36,7 @@ class NFA
 
         unsigned int start;
         unsigned int end;
-        std::vector<std::vector<NFALink>> nodes;
+        std::vector<std::vector<NodeLink>> nodes;
     protected:
         std::stack<unsigned int> _empty;
     private:

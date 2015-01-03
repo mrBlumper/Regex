@@ -35,6 +35,8 @@
 		</Compiler>
 		<Unit filename="Automata.cpp" />
 		<Unit filename="Automata.h" />
+		<Unit filename="DFA.cpp" />
+		<Unit filename="DFA.h" />
 		<Unit filename="NFA.cpp" />
 		<Unit filename="NFA.h" />
 		<Unit filename="Regex.cpp" />

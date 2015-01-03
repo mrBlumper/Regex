@@ -8,7 +8,7 @@ NFA::NFA()
 unsigned int NFA::getFirstEmptyNode(){
     unsigned int i = 0;
     if (this->_empty.empty()){
-        this->nodes.push_back(std::vector<NFALink>());
+        this->nodes.push_back(std::vector<NodeLink>());
 
         i = this->nodes.size() - 1;
     } else {
@@ -81,19 +81,18 @@ void NFA::show(){
     file.close();
     system("dot -Tpng -onfa.png nfa.gv");
     system("nfa.png");
-
 }
 
 Sub_Nfa NFA::buildBranchZeroorone(Sub_Nfa a, short c){
     unsigned int s = std::get<0>(a);
     unsigned int e = std::get<1>(a);
-    this->nodes[s].push_back(NFALink(e, 0));
+    this->nodes[s].push_back(NodeLink(e, 0));
     return Sub_Nfa(s, e);
 }
 
 Sub_Nfa NFA::buildBranchZeroormore(Sub_Nfa a, short c){
     Sub_Nfa temp = this->buildBranchOneormore(a, c);
-    this->nodes[std::get<0>(temp)].push_back(NFALink(std::get<1>(temp), 0));
+    this->nodes[std::get<0>(temp)].push_back(NodeLink(std::get<1>(temp), 0));
     return temp;/*
     unsigned int t_s = a.get(0), t_e = a.get(1);
     unsigned int s, e = this->getFirstEmptyNode(), this->getFirstEmptyNode();
@@ -107,9 +106,9 @@ Sub_Nfa NFA::buildBranchZeroormore(Sub_Nfa a, short c){
 Sub_Nfa NFA::buildBranchOneormore(Sub_Nfa a, short c){
     unsigned int t_s = std::get<0>(a), t_e = std::get<1>(a);
     unsigned int s = this->getFirstEmptyNode(), e = this->getFirstEmptyNode();
-    this->nodes[t_e].push_back(NFALink(t_s, 0));
-    this->nodes[s].push_back(NFALink(t_s, 0));
-    this->nodes[t_e].push_back(NFALink(e, 0));
+    this->nodes[t_e].push_back(NodeLink(t_s, 0));
+    this->nodes[s].push_back(NodeLink(t_s, 0));
+    this->nodes[t_e].push_back(NodeLink(e, 0));
     return Sub_Nfa(s, e);
 }
 
@@ -117,10 +116,10 @@ Sub_Nfa NFA::buildBranchOr(Sub_Nfa a, Sub_Nfa b, short c){
     unsigned int n1_s = std::get<0>(a), n1_e = std::get<1>(a);
     unsigned int n2_s = std::get<0>(b), n2_e = std::get<1>(b);
     unsigned int s = this->getFirstEmptyNode(), e = this->getFirstEmptyNode();
-    this->nodes[s].push_back(NFALink(n1_s, 0));
-    this->nodes[s].push_back(NFALink(n2_s, 0));
-    this->nodes[n1_e].push_back(NFALink(e, 0));
-    this->nodes[n2_e].push_back(NFALink(e, 0));
+    this->nodes[s].push_back(NodeLink(n1_s, 0));
+    this->nodes[s].push_back(NodeLink(n2_s, 0));
+    this->nodes[n1_e].push_back(NodeLink(e, 0));
+    this->nodes[n2_e].push_back(NodeLink(e, 0));
     return Sub_Nfa(s, e);
 }
 Sub_Nfa NFA::buildBranchConcat(Sub_Nfa a, Sub_Nfa b, short c){
@@ -136,7 +135,7 @@ Sub_Nfa NFA::buildBranchConcat(Sub_Nfa a, Sub_Nfa b, short c){
 
 Sub_Nfa NFA::buildBranchNormal(short c){
     unsigned int s = this->getFirstEmptyNode(), e = this->getFirstEmptyNode();
-    this->nodes[s].push_back(NFALink(e, c));
+    this->nodes[s].push_back(NodeLink(e, c));
     return Sub_Nfa(s, e);
 }
 
