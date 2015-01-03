@@ -40,9 +40,9 @@ int main(){
     //RegexFormater f("\\.zr$e\\$r[:punct:]e[^za()z[e\\]r]z.t");
     f.convert();*/
 
-    Regex regex("[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}");
+    Regex regex("[:digits:]{4}$");
     regex.compile();
-    std::string to_match = "pierre.oechsel@laposte.netzr";
+    std::string to_match = "0453";
     int pos = regex.match(to_match);
     if (pos >= 0)
     std::cout<<"find "<<pos<<" "<<to_match.substr(0, pos)<<"\n";

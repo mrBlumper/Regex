@@ -24,6 +24,9 @@ class Regex
         std::vector<short>  _postfix;
         NFA                 _nfa;
         DFA                 _dfa;
+
+        bool _start_symbol;
+        bool _end_symbol;
     private:
 };
 

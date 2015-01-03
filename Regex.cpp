@@ -15,6 +15,11 @@ int REGEX_precedence(short c){
 }
 
 int Regex::match(std::string m){
+    if (this->_start_symbol){
+        m.insert(0, toStr(SYMBOL::BEGIN_WORD));
+    } else if (this->_end_symbol){
+        m += SYMBOL::END_WORD;
+    }
     unsigned int state = 0;
     int end = -1;
     for (int i = 0; i < m.size(); i++){
@@ -30,11 +35,12 @@ int Regex::match(std::string m){
         }
         state = _dfa.links[state].out[c];
     }
+    end -= this->_end_symbol;
     return end;
 }
 
 Regex::Regex(std::string reg):
-    _base(reg)
+    _base(reg), _end_symbol(false), _start_symbol(false)
 {
     //ctor
 }
@@ -56,10 +62,16 @@ void Regex::compile(){
             }
         }
     }
-    this->toPostfix();
-    std::cout<<"postfix\n";
+    this->toPostfix();/*
+    std::cout<<"postfix\n";*/
     for (auto &c : this->_postfix){
-        if (isRange(c)){
+        if (c == SYMBOL::BEGIN_WORD){
+            this->_start_symbol = true;
+        }
+        else if (c == SYMBOL::END_WORD){
+            this->_end_symbol = true;
+        }
+        /*if (isRange(c)){
             std::cout<<"[ RANGE : "<<(char)(c&0xff)<<" "<<(char)(c>>8)<<" ]\n";
         } else {
             if (SYMBOL::isOp((char)c)){
@@ -67,7 +79,7 @@ void Regex::compile(){
             } else {
                 std::cout<<"[ "<<(char)c<<" ]\n";
             }
-        }
+        }*/
     }
     _nfa.build(this->_postfix);
     //_nfa.show();
