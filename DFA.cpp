@@ -91,13 +91,17 @@ void DFA::show(){
             short c = it->first;
             std::string label = "";
             if (isRange(c)){
+                label += "\"";
                 label += (char)(c%0xff);
                 label += '-';
                 label += (char)(c>>8);
+                label += "\"";
             } else if (!c){
                 label =  "\"&#949;\"";
             } else {
-                label = (char)c;
+                label = "\"";
+                label += (char)c;
+                label += "\"";
             }
             file<<"        "<<i<<" -> "<<it->second<<" [label="<<label<<"]\n";
         }

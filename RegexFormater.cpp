@@ -7,26 +7,27 @@ RegexFormater::RegexFormater(std::string regex):
 }
 
 void RegexFormater::setExplicitConcat(){
-    std::string temp;
-    for (int i = 0; i < this->_current.size() - 1; i++){
-        char c = this->_current[i];
-        temp += c;
-        char n = this->_current[i+1];
+    std::vector<short> temp;
+    for (int i = 0; i < this->_temp_shorts.size() - 1; i++){
+        short c = this->_temp_shorts[i];
+        temp.push_back(c);
+        short n = this->_temp_shorts[i+1];
         if (c != SYMBOL::OPEN_PAR && c != SYMBOL::OR && n != SYMBOL::CLOSE_PAR &&
             n != SYMBOL::OR && n != SYMBOL::CONCATENATION && n != SYMBOL::ZEROORMORE && n != SYMBOL::ZEROORONE && n != SYMBOL::ONEORMORE){
-            temp += SYMBOL::CONCATENATION;
+            temp.push_back(SYMBOL::CONCATENATION);
         }
     }
-    temp += this->_current[this->_current.size() - 1];
-    this->_current = temp;
+    temp.push_back(this->_temp_shorts[this->_temp_shorts.size() - 1]);
+    this->_temp_shorts = temp;
 }
 
 void RegexFormater::convert(){
     this->treatSpecialCharacters();
     this->replaceGroups();
     this->createDuplicatas();
-    this->setExplicitConcat();
     this->convertToShort();
+    this->setExplicitConcat();
+    this->debug();
 }
 
 void RegexFormater::convertToShort(){
@@ -53,6 +54,7 @@ void RegexFormater::convertToShort(){
         } else {
             if (*it == SYMBOL::CLOSE_BRACKET){
                 for (int i = 0; i < 128; ++i){
+                        //std::cout<<(char)i<<" "<<brackets_content[i]<<"\n";
                     if (brackets_content[i] == !inverse){
                         char begin = i;
                         while (i+1 < 128 && brackets_content[i+1] == !inverse){ ++i; }
@@ -295,13 +297,16 @@ std::string RegexFormater::getPreviousGroup(const unsigned int pos){
     }
     std::string output = "";
 
+    char d = 0;
+
     if (in(SYMBOL::operators, this->_current[pos - 1])){
         return "";
-    } else if (this->_current[pos - 1] == SYMBOL::CLOSE_PAR){
+    } else if (this->_current[pos - 1] == SYMBOL::CLOSE_PAR || this->_current[pos - 1] == SYMBOL::CLOSE_BRACKET){
+        d = this->_current[pos - 1];
         int nb = 0;
         for (int i = pos - 1; i >= 0; --i){
-            nb += (this->_current[i] == SYMBOL::CLOSE_PAR);
-            nb -= (this->_current[i] == SYMBOL::OPEN_PAR);
+            nb += (this->_current[i] == d);
+            nb -= (this->_current[i] == ((d == SYMBOL::CLOSE_BRACKET)? SYMBOL::OPEN_BRACKET : SYMBOL::OPEN_PAR));
             std::string temp;
             temp = this->_current[i];
             output.insert(0, temp);
@@ -309,14 +314,14 @@ std::string RegexFormater::getPreviousGroup(const unsigned int pos){
             if (nb == 0){
                 break;
             }
-        }
+        }/*
         for (auto &c : output){
             if (c == SYMBOL::OPEN_PAR)  std::cout<<"(";
             else if (c == SYMBOL::CLOSE_PAR)  std::cout<<")";
             else if (c == SYMBOL::OR)  std::cout<<"|";
             else    std::cout<<c;
         }
-        std::cout<<"\n";
+        std::cout<<"\n";*/
         //std::cout<<"-----"<<output<<"\n";
         return output;
     } else {

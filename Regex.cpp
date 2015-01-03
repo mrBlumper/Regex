@@ -41,11 +41,38 @@ Regex::Regex(std::string reg):
 
 void Regex::compile(){
     this->format();
+    std::map<char, char> reversed;
+    for (auto it = SYMBOL::special_chars.begin(); it != SYMBOL::special_chars.end(); ++it){
+        reversed[it->second] = it->first;
+    }
+    for (auto &c : this->_formated){
+        if (isRange(c)){
+            std::cout<<"[ RANGE : "<<(char)(c&0xff)<<" "<<(char)(c>>8)<<" ]\n";
+        } else {
+            if (SYMBOL::isOp((char)c)){
+                std::cout<<"[ OPERATOR : "<<reversed[(char)c]<<" ]\n";
+            } else {
+                std::cout<<"[ "<<(char)c<<" ]\n";
+            }
+        }
+    }
     this->toPostfix();
+    std::cout<<"postfix\n";
+    for (auto &c : this->_postfix){
+        if (isRange(c)){
+            std::cout<<"[ RANGE : "<<(char)(c&0xff)<<" "<<(char)(c>>8)<<" ]\n";
+        } else {
+            if (SYMBOL::isOp((char)c)){
+                std::cout<<"[ OPERATOR : "<<reversed[(char)c]<<" ]\n";
+            } else {
+                std::cout<<"[ "<<(char)c<<" ]\n";
+            }
+        }
+    }
     _nfa.build(this->_postfix);
     //_nfa.show();
     _dfa.build(_nfa);
-    _dfa.show();
+    //_dfa.show();
 }
 
 void Regex::format(){
